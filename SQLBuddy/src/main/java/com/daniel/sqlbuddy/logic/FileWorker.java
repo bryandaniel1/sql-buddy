@@ -16,6 +16,9 @@
 package com.daniel.sqlbuddy.logic;
 
 import com.daniel.sqlbuddy.controller.FileListener;
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -83,6 +86,19 @@ public class FileWorker extends SwingWorker<Void, Object> {
     protected void done() {
         if (FileListener.OPEN_COMMAND.equals(command)) {
             queryTextPane.setText(fileContents.toString());
+
+            /*
+             * The robot is utilized to trigger the key listener of the text 
+             * pane to evaluate the new content and apply appropriate styling.
+             */
+            try {
+                queryTextPane.requestFocus();
+                Robot keyListenerTrigger = new Robot();
+                keyListenerTrigger.keyPress(KeyEvent.VK_SHIFT);
+                keyListenerTrigger.keyRelease(KeyEvent.VK_SHIFT);
+            } catch (AWTException e) {
+                logger.error("AWTException occurred while presenting file.", e);
+            }
         }
     }
 

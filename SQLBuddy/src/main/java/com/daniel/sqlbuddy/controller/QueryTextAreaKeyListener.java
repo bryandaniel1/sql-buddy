@@ -97,8 +97,7 @@ public class QueryTextAreaKeyListener implements KeyListener {
      */
     private boolean shouldInspectTextForComments(KeyEvent e) {
         return e.getKeyCode() == KeyEvent.VK_V
-                || (e.getKeyCode() != KeyEvent.VK_BACK_SPACE && !e.isControlDown()
-                && e.getKeyCode() != KeyEvent.VK_CONTROL);
+                || (!e.isControlDown() && e.getKeyCode() != KeyEvent.VK_CONTROL);
     }
 
     /**

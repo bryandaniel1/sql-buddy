@@ -78,11 +78,6 @@ public class QueryWindowAssembler implements WindowAssembler {
     private final ConnectionProperties properties;
 
     /**
-     * The window containing all components
-     */
-    private QueryWindow queryWindow;
-
-    /**
      * The input area for queries
      */
     private JTextPane queryTextPane;
@@ -121,14 +116,14 @@ public class QueryWindowAssembler implements WindowAssembler {
     @Override
     public JFrame assembleWindow() {
 
-        queryWindow = new QueryWindow(WELCOME);
+        QueryWindow queryWindow = new QueryWindow(WELCOME);
         queryWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         queryWindow.setSize(QUERY_WINDOW_WIDTH.intValue(), QUERY_WINDOW_HEIGHT.intValue());
 
         if (theme == null) {
             theme = themeManager.createTheme(ThemeManager.ThemeSelection.METALLIC);
         }
-        buildContentPane();
+        buildContentPane(queryWindow);
         buildMenuBar(queryWindow);
 
         return queryWindow;
@@ -516,14 +511,14 @@ public class QueryWindowAssembler implements WindowAssembler {
 
         JMenu fileMenu = new JMenu(QueryWindow.FILE_MENU);
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        
-        FileListener fileListener = new FileListener(queryTextPane); 
-        
+
+        FileListener fileListener = new FileListener(queryTextPane);
+
         JMenuItem openMenuItem = new JMenuItem(FileListener.OPEN_COMMAND);
         openMenuItem.setToolTipText("Open file");
         openMenuItem.setMnemonic(KeyEvent.VK_O);
         openMenuItem.addActionListener(fileListener);
-        
+
         JMenuItem saveAsMenuItem = new JMenuItem(FileListener.SAVE_AS_COMMAND);
         saveAsMenuItem.setMnemonic(KeyEvent.VK_S);
         saveAsMenuItem.setToolTipText("Save file");
@@ -541,13 +536,13 @@ public class QueryWindowAssembler implements WindowAssembler {
         themesMenuItem.setToolTipText("Choose a UI theme.");
 
         JMenuItem metallicThemeMenuItem = new JMenuItem(ThemeSelection.METALLIC.getName());
-        assignThemeChangeListener(metallicThemeMenuItem);
+        assignThemeChangeListener(queryWindow, metallicThemeMenuItem);
 
         JMenuItem sunnyThemeMenuItem = new JMenuItem(ThemeSelection.SUNNY.getName());
-        assignThemeChangeListener(sunnyThemeMenuItem);
+        assignThemeChangeListener(queryWindow, sunnyThemeMenuItem);
 
         JMenuItem underwaterThemeMenuItem = new JMenuItem(ThemeSelection.UNDERWATER.getName());
-        assignThemeChangeListener(underwaterThemeMenuItem);
+        assignThemeChangeListener(queryWindow, underwaterThemeMenuItem);
 
         themesMenuItem.add(metallicThemeMenuItem);
         themesMenuItem.add(sunnyThemeMenuItem);
@@ -566,14 +561,16 @@ public class QueryWindowAssembler implements WindowAssembler {
      * Assigns the action listener to the given menu item to handle changing a
      * UI theme.
      *
+     * @param queryWindow the query editor window
      * @param menuItem the menu item
      */
-    private void assignThemeChangeListener(JMenuItem menuItem) {
+    private void assignThemeChangeListener(QueryWindow queryWindow, JMenuItem menuItem) {
         menuItem.addActionListener((event) -> {
             theme = themeManager.createTheme(ThemeSelection.valueOf(event.getActionCommand().toUpperCase()));
             queryWindow.getContentPane().removeAll();
             queryWindow.getContentPane().invalidate();
-            buildContentPane();
+            buildContentPane(queryWindow);
+            buildMenuBar(queryWindow);
             queryWindow.repaint();
             queryWindow.revalidate();
         });
@@ -581,8 +578,10 @@ public class QueryWindowAssembler implements WindowAssembler {
 
     /**
      * Creates and assembles the components for the window content.
+     *
+     * @param queryWindow the query editor window
      */
-    private void buildContentPane() {
+    private void buildContentPane(QueryWindow queryWindow) {
         queryTextPane = new JTextPane();
         queryTextPane.setPreferredSize(new Dimension(20, 30));
         queryTextPane.setEditable(true);
