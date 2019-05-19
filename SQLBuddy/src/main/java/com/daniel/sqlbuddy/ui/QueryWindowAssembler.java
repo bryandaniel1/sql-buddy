@@ -500,6 +500,43 @@ public class QueryWindowAssembler implements WindowAssembler {
     }
 
     /**
+     * Creates and assembles the components for the window content.
+     *
+     * @param queryWindow the query editor window
+     */
+    private void buildContentPane(QueryWindow queryWindow) {
+        queryTextPane = new JTextPane();
+        queryTextPane.setPreferredSize(new Dimension(20, 30));
+        queryTextPane.setEditable(true);
+        queryTextPane.setEnabled(true);
+        queryTextPane.setBackground(theme.getBackgroundColor());
+        queryTextPane.setForeground(theme.getForegroundColor());
+        queryTextPane.setSelectedTextColor(theme.getForegroundColor());
+        queryTextPane.setCaretColor(theme.getCaretColor());
+        queryTextPane.setDisabledTextColor(theme.getDisabledTextColor());
+
+        QueryTextAreaKeyListener keyListener = new QueryTextAreaKeyListener(queryTextPane, theme);
+        queryTextPane.addKeyListener(keyListener);
+
+        ResultsPanel resultsPanel = new ResultsPanel();
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        resultsPanel.add(tabbedPane);
+
+        queryListener = new QueryListener(queryTextPane, properties, tabbedPane);
+
+        queryWindow.setLayout(new BorderLayout());
+        queryWindow.add(new TitlePanel(), BorderLayout.NORTH);
+        queryWindow.add(new Pillar(), BorderLayout.WEST);
+        JPanel centerPanel = new JPanel(new GridLayout(2, 1));
+        centerPanel.add(new QueryPanel());
+        centerPanel.add(resultsPanel);
+        queryWindow.add(centerPanel, BorderLayout.CENTER);
+        queryWindow.add(new Pillar(), BorderLayout.EAST);
+        queryWindow.add(new ButtonPanel(), BorderLayout.SOUTH);
+    }
+
+    /**
      * Composes the menu bar of the query window and defines the menu item
      * actions.
      *
@@ -574,42 +611,5 @@ public class QueryWindowAssembler implements WindowAssembler {
             queryWindow.repaint();
             queryWindow.revalidate();
         });
-    }
-
-    /**
-     * Creates and assembles the components for the window content.
-     *
-     * @param queryWindow the query editor window
-     */
-    private void buildContentPane(QueryWindow queryWindow) {
-        queryTextPane = new JTextPane();
-        queryTextPane.setPreferredSize(new Dimension(20, 30));
-        queryTextPane.setEditable(true);
-        queryTextPane.setEnabled(true);
-        queryTextPane.setBackground(theme.getBackgroundColor());
-        queryTextPane.setForeground(theme.getForegroundColor());
-        queryTextPane.setSelectedTextColor(theme.getForegroundColor());
-        queryTextPane.setCaretColor(theme.getCaretColor());
-        queryTextPane.setDisabledTextColor(theme.getDisabledTextColor());
-
-        QueryTextAreaKeyListener keyListener = new QueryTextAreaKeyListener(queryTextPane, theme);
-        queryTextPane.addKeyListener(keyListener);
-
-        ResultsPanel resultsPanel = new ResultsPanel();
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        resultsPanel.add(tabbedPane);
-
-        queryListener = new QueryListener(queryTextPane, properties, tabbedPane);
-
-        queryWindow.setLayout(new BorderLayout());
-        queryWindow.add(new TitlePanel(), BorderLayout.NORTH);
-        queryWindow.add(new Pillar(), BorderLayout.WEST);
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1));
-        centerPanel.add(new QueryPanel());
-        centerPanel.add(resultsPanel);
-        queryWindow.add(centerPanel, BorderLayout.CENTER);
-        queryWindow.add(new Pillar(), BorderLayout.EAST);
-        queryWindow.add(new ButtonPanel(), BorderLayout.SOUTH);
     }
 }
